@@ -1,0 +1,12 @@
+# Cache
+__pycache__/
+
+# Venv
+.venv/
+
+# Build
+build/
+dist/
+
+# Jupyter Notebook
+.ipynb_checkpoints
