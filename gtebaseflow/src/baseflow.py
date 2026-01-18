@@ -5,6 +5,12 @@ from tools.data import Station
 from tools.viewer import Fig2D
 
 
+def load_about(files_up, row):
+    """Carrega a página sobre caso não haja arquivo carregado."""
+    if files_up == []:
+        row.html('gtebaseflow/src/about.html')
+
+
 def select_inline(lb, ops, key_id, index=0,  pc=0.5):
     """Gera entrada para selecionar nome de coluna."""
     c01, c02 = st.columns([pc, 1-pc])
@@ -160,24 +166,22 @@ def calc_baseflow(k):
 
 def plot_chart(row02):
     """Faz plotagem do gráfico com as vazões"""
-    fig_q = Fig2D()
     if 'station' in st.session_state:
+        fig_q = Fig2D()
         dates = st.session_state.station.df_ts[st.session_state.station.col_datetime]
         streamflows = st.session_state.station.df_ts[st.session_state.station.col_streamflow]
         baseflows = st.session_state.station.df_ts[st.session_state.station.col_baseflow]
         fig_q.load_traces(dates, streamflows, baseflows)
-
-    fig_q.create_fig()
-    if 'station' in st.session_state:
+        fig_q.create_fig()
         fig_q.update_layout(title=st.session_state.station.name)
-    
-    row02.plotly_chart(fig_q.fig)
+        row02.plotly_chart(fig_q.fig)
 
 
-def input_box():
+def input_box(row01):
     """Entrada de arquivos."""
     with st.sidebar.expander("Arquivos de Entrada", expanded=True):
         files_up = st.file_uploader('Carregue o(s) arquivo(s) de vazão:', type='xlsx',  accept_multiple_files=True)
+        load_about(files_up, row01)
         files_byname = get_filenames(files_up)
         filename = select_inline(lb="Arquivo:", ops=files_byname.keys(), key_id='filename_q')
         shts_name = get_shtnames(filename, files_byname)
@@ -233,11 +237,11 @@ def output_box():
 
 def content():
     """Conteúdo como função."""
-    st.sidebar.markdown("""## Separador de Fluxo de Base""")
+    st.sidebar.markdown("""## GTE Baseflow""")
     row01 = st.container()
     row02 = st.container()
     row03 = st.container()
-    input_box()
+    input_box(row01)
     config_box()
     process_box(row02)
     output_box()

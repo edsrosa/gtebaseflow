@@ -28,8 +28,8 @@ class Fig2D():
 
     def load_traces(self, dates, streamflows, baseflows):
         """Carrega os traces para plotagem."""
-        streamflow_trace = go.Scatter(x=dates, y=streamflows, name='Fluxo Total', mode='lines', marker_color='blue')
-        baseflow_trace = go.Scatter(x=dates, y=baseflows, name='Fluxo de Base', mode='lines', marker_color='red')
+        streamflow_trace = go.Scatter(x=dates, y=streamflows, name='Fluxo Total', mode='lines', marker_color="#6583e9")
+        baseflow_trace = go.Scatter(x=dates, y=baseflows, name='Fluxo de Base', mode='lines', marker_color="#df5151")
         self.traces = [streamflow_trace, baseflow_trace]
     
     def create_fig(self):
