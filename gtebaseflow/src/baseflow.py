@@ -6,9 +6,9 @@ from tools.viewer import Fig2D
 from src import utils
 
 
-def load_about(row):
+def load_about(files_up_q, row):
     """Carrega a página sobre caso não haja arquivo carregado."""
-    if st.session_state.files_up_q == []:
+    if files_up_q == []:
         row.html('gtebaseflow/src/about.html')
 
 
@@ -181,17 +181,12 @@ def plot_chart(row02):
 def input_box(row01):
     """Entrada de arquivos."""
     with st.sidebar.expander("Arquivos de Entrada", expanded=True):
-        st.session_state.files_up_q = st.file_uploader('Carregue o(s) arquivo(s) de vazão:', 
-                                    type='xlsx',  accept_multiple_files=True, 
-                                    on_change=utils.get_files_byname)
-        load_about(row01)
-        filename = select_inline(lb="Arquivo:", ops=st.session_state.files_byname_q.keys(), key_id='filename_q')
-        shts_name = get_shtnames(filename, st.session_state.files_byname_q)
-        sht_name = select_inline(lb="Planilha:", ops=shts_name, key_id='sht_name_q')
-        cols_name = get_colsname(st.session_state.files_byname_q, filename, sht_name)
-        col_datetime = select_inline(lb='Data:', ops=cols_name, index=None, key_id='col_datetime_q')
-        col_streamflow = select_inline(lb='Vazão (m³/s):', ops=cols_name, index=None, key_id='col_streamflow_q')
-        load_station(st.session_state.files_byname_q, filename, sht_name, col_datetime, col_streamflow)
+        files_up_q, files_byname_q, filename_q, shtname_q, cols_name, col_datetime, col_streamflow = utils.load_xlsx(title="Vazão", 
+                        label_up="Carregue os arquivos de vazão:",
+                        multiple=True)
+        
+        load_station(files_byname_q, filename_q, shtname_q, col_datetime, col_streamflow)
+        load_about(files_up_q, row01)
 
         with st.expander('Precipitação'):
             st.info('Dados de precipitação são opcionais, porém enriquecem a análise.')
@@ -213,7 +208,7 @@ def input_box(row01):
 
 def config_box():
     """Configurações."""
-    with st.sidebar.expander("Configuração", expanded=True):
+    with st.sidebar.expander("Configurações", expanded=True):
         name_station = st.text_input(label='name_station', label_visibility='collapsed', placeholder='Nome da Estação')
         area_bacia = st.number_input(label='area_bacia', label_visibility='collapsed', placeholder='Área de Bacia (km²)', min_value=0.0000001, value=None, format="%0.6f")
         start_wet = get_num_month(label='Início Período Chuvoso:', index=9, key_id='start_wet')

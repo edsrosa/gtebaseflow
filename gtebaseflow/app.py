@@ -1,10 +1,8 @@
 import streamlit as st
 
 from src.baseflow import baseflow
-
 from src.utils import start_session_states
 
-start_session_states()
 
 def rodape():
     st.html("<div class='footer'>"
