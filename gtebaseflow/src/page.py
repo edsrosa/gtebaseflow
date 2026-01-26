@@ -51,10 +51,11 @@ def get_configs(name_station, area_bacia, start_wet, start_dry):
         st.session_state.station.area_km2=area_bacia
 
 
-def classify_season(start_wet, start_dry):
+def classify_season_hydroyear(start_wet, start_dry):
     """Faz classificação dos períodos chuvoso e seco."""
     if 'station' in st.session_state:
         st.session_state.station.classify_season(start_wet, start_dry)
+        st.session_state.station.classify_hydroyears(start_wet)
 
 
 def calc_baseflow(k):
@@ -101,7 +102,14 @@ def load_rainfall():
                     cols_in=cols_in_plu,
                     sufix_id='plu',
                     multiple=False)
-    
+
+
+def export_dfs():
+    """Exporta os dados atuais para arquivo Excel."""
+    buffer = st.session_state.station.export_dfs()
+    filename_output = st.session_state.station.filename_output
+    return buffer, filename_output
+
 
 def input_box(row01):
     """Entrada de arquivos."""
@@ -119,7 +127,7 @@ def config_box():
         start_dry = utils.get_num_month(label='Início Período Seco:', index=3, key_id='start_dry')
 
         get_configs(name_station, area_bacia, start_wet, start_dry)
-        classify_season(start_wet, start_dry)
+        classify_season_hydroyear(start_wet, start_dry)
         # type_plu = utils.get_type_plu(label="Dados Precipitação:", index=0, key_id='type_plu')
 
 
@@ -134,7 +142,9 @@ def process_box(row02):
 def output_box():
     """Exportação"""
     with st.sidebar.expander("Exportação dos Arquivos", expanded=True):
-        st.button('Export', width='stretch')
+        if st.button('Preparar Dados para Download', width='stretch'):
+            dfs_down = export_dfs()
+            st.download_button('Baixar dados', data=dfs_down[0], file_name=dfs_down[1], width='stretch')
 
 
 def content():

@@ -1,5 +1,6 @@
 import os
 from math import exp
+import io
 
 import pandas as pd
 
@@ -16,6 +17,7 @@ class Station():
         self.name=None  # Nome da estação
         self.area_km2=None # Área da bacia em km²
         self.df_ts=None # Dataframe com os dados timeserie
+        self.filename_output=None # Nome do arquivo de saída
     
     def set_parameters(self, file_obj, filename, sht_ts, col_datetime, col_streamflow):
         """Recupera os parâmetros para carregar a estação"""
@@ -25,8 +27,11 @@ class Station():
         self.col_datetime = col_datetime
         self.col_streamflow = col_streamflow
 
+        self.filename_output = 'baseflow_' + filename
+
         if self.name == None:
             self.name = os.path.splitext(filename)[0]
+
         
     def load_df(self):
         """Carrega os dados do dataframe."""
@@ -96,8 +101,40 @@ class Station():
         self.calc_bfi()
         self.df_ts[self.col_baseflow] = self.baseflow
 
+
     def classify_season(self, start_wet, start_dry):
         """Faz classificação em período seco e chuvoso."""
         self.df_ts['season'] = 'wet'
         dry_br = (self.df_ts[self.col_datetime].dt.month >= start_dry) & (self.df_ts[self.col_datetime].dt.month < start_wet)
         self.df_ts['season'] = self.df_ts['season'].mask(dry_br, 'dry')
+    
+
+    def classify_hydroyear(self, date, start_wet):
+        """Faz classificação do ano hidro para cada data."""
+        if date.dt.month >= start_wet:
+            start_year =  date.dt.year
+        else:
+            start_year =  date.dt.year - 1
+        hydroyear = str(start_year) + '-' + str(start_year + 1)
+
+        return hydroyear
+
+
+    def classify_hydroyears(self, start_wet):
+        """Classificação do ano hidrológico.
+        Considera que ano hidrológico começa no primeiro dia do período chuvoso."""
+        #self.df_ts['year_hydro'] = self.df_ts[self.col_datetime].apply(self.classify_hydroyear, args=(start_wet,))
+        self.df_ts['year_hydro'] = self.df_ts[self.col_datetime].dt.year
+        start_y = self.df_ts[self.col_datetime].dt.month < start_wet
+        self.df_ts['year_hydro'] = self.df_ts['year_hydro'].mask(start_y, self.df_ts['year_hydro']-1)
+        self.df_ts['year_hydro'] = self.df_ts['year_hydro'].astype('str') + '-' + (self.df_ts['year_hydro'] +1).astype('str')
+
+
+
+    def export_dfs(self):
+        """Exportao dados do df para arquivo excel."""
+        buffer = io.BytesIO()
+        with pd.ExcelWriter(buffer) as writer:
+            self.df_ts.to_excel(writer, index=False, sheet_name='baseflow')
+
+        return buffer
