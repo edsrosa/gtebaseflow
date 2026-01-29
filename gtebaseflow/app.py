@@ -6,8 +6,9 @@ from src.utils import start_session_states
 
 def rodape():
     st.html("<div class='footer'>"
-            "<p>© 2026 ESR Geology and Technology.</p>"
-            "<p> All rights reserved.</p> </div>"
+            "<p><a href='https://github.com/edsrosa' target='_blank'>© 2026 Ednilson Rosa.</a></p>"
+            "<p>Todos os direitos reservados.</p>"
+            "</div>"
             )
     
 st.html('gtebaseflow/src/style.css')

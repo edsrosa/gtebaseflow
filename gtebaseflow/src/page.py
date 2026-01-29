@@ -146,6 +146,11 @@ def output_box():
             dfs_down = export_dfs()
             st.download_button('Baixar dados', data=dfs_down[0], file_name=dfs_down[1], width='stretch')
 
+def help_box():
+    """Exportação"""
+    with st.sidebar.expander("Ajuda", expanded=True):
+        utils.load_help()
+
 
 def content():
     """Conteúdo como função."""
@@ -157,6 +162,7 @@ def content():
     config_box()
     process_box(row02)
     output_box()
+    help_box()
 
 
 baseflow = st.Page(content, 

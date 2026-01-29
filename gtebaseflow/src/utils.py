@@ -141,3 +141,9 @@ def get_type_plu(label, index, key_id):
                 }
     type_plu = get_value(label=label, key_values=types_plu, key_id=key_id, index=index)
     return type_plu
+
+
+def load_help():
+    """Carrega o arquivo de ajuda."""
+    st.html('gtebaseflow/src/help.html')
+

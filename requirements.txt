@@ -3,3 +3,4 @@ numpy
 openpyxl
 pandas
 plotly
+streamlit>=1.52.0
